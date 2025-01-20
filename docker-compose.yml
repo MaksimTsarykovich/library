@@ -1,0 +1,61 @@
+services:
+  php:
+    build: ./app/docker/php/
+    container_name: library_php
+    volumes:
+      - ./app/:/var/www/html/public
+      - ./app/docker/php/php.ini:/usr/local/etc/php/php.ini
+    ports:
+      - "9000:9000"
+    networks:
+      - app-network
+
+  webserver:
+    image: nginx:latest
+    container_name: library_nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./app/public:/var/www/html/public
+      - ./app/docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    networks:
+      - app-network
+
+  db:
+    build: ./app/docker/mysql/
+    container_name: library_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: app
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: library_phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+volumes:
+  db_data:
+
+networks:
+  app-network:
+    driver: bridge
