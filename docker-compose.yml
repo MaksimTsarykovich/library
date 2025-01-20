@@ -3,7 +3,7 @@ services:
     build: ./app/docker/php/
     container_name: library_php
     volumes:
-      - ./app/:/var/www/html/public
+      - ./app/public:/var/www/html/public
       - ./app/docker/php/php.ini:/usr/local/etc/php/php.ini
     ports:
       - "9000:9000"
@@ -16,7 +16,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./app/public:/var/www/html/public
+      - ./app:/var/www/html/public
       - ./app/docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - php
