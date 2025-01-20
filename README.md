@@ -43,7 +43,7 @@ README.md # Документация проекта
 
 ### 2. Клонируйте проект:
 ```bash
-git clone https://github.com/your-username/library-project.git
+git clone https://github.com/MaksimTsarykovich/library.git
 cd library-project
 ```
 ### 3. Запустите проект:
