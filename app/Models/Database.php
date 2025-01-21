@@ -1,73 +1,35 @@
 <?php
 
+require_once '../Config/DatabaseConfig.php';
+
 class Database
 {
     private static ?Database $instance = null;
     private ?PDO $connection = null;
-    private string $host = 'localhost';
-    private string $user = 'user';
-    private string $pass = 'password';
-    private string $databaseName = 'database';
+    private DatabaseConfig $config;
 
 
-    private function __construct()
+    private function __construct($config)
     {
-
+        $this->config = $config;
     }
 
-    public function getInstance(): self
+    public static function getInstance(DatabaseConfig $config): self
     {
         if (self::$instance === null) {
-            self::$instance = new self();
+            self::$instance = new self($config);
         }
         return self::$instance;
     }
 
-    public function getConnection(): PDO
+    public function connectToDatabase(): PDO
     {
         if ($this->connection === null) {
-            try {
-                $this->connection = new PDO("mysql:host={$this->host};dbname={$this->databaseName}", $this->user, $this->pass);
-            } catch (PDOException $e) {
-                die("Database connection failed" . $e->getMessage());
-            }
+            $dsn = "mysql:host={$this->config->getHost()};dbname={$this->config->getDatabaseName()};charset={$this->config->getCharset()}";
+            $this->connection = new PDO($dsn, $this->config->getUsername(), $this->config->getPassword());
         }
         return $this->connection;
     }
 
-    public function setHost(string $host): Database
-    {
-        $this->checkConnectionNotEstablished();
-        $this->host = $host;
-        return $this;
-    }
-
-    public function setUser(string $user): Database
-    {
-        $this->checkConnectionNotEstablished();
-        $this->user = $user;
-        return $this;
-    }
-
-    public function setPass(string $pass): Database
-    {
-        $this->checkConnectionNotEstablished();
-        $this->pass = $pass;
-        return $this;
-    }
-
-    public function setDatabaseName(string $databaseName): Database
-    {
-        $this->checkConnectionNotEstablished();
-        $this->databaseName = $databaseName;
-        return $this;
-    }
-
-    private function checkConnectionNotEstablished(): void
-    {
-        if (self::$instance === null) {
-            throw new Exception("Cannot modify configuration after connection is established");
-        }
-    }
 
 }
